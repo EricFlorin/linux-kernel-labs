@@ -8,12 +8,16 @@ ZIMAGE = $(KDIR)/arch/$(ARCH)/boot/$(b)zImage
 KCONFIG = $(KDIR)/.config
 NTTCP = $(KDIR)/tools/labs/templates/assignments/6-e100/nttcp
 
-YOCTO_URL = http://downloads.yoctoproject.org/releases/yocto/yocto-2.3/machines/qemu/qemu$(ARCH)/
-YOCTO_IMAGE = core-image-minimal-qemu$(ARCH).ext4
-#YOCTO_IMAGE = core-image-minimal-dev-qemu$(ARCH).ext4
-#YOCTO_IMAGE = core-image-sato-dev-qemu$(ARCH).ext4
-#YOCTO_IMAGE = core-image-sato-qemu$(ARCH).ext4
-#YOCTO_IMAGE = core-image-sato-sdk-qemu$(ARCH).ext4
+# NOTE(ericflorin): The original `qemu/Makefile` from https://linux-kernel-labs.github.io/ would
+# attempt to obtain the Yocto 2.3 QEMU images; however, Yocto 2.3 has been deprecated. Patched
+# `qemu/Makefile` so that it obtains the latest stable Yocto 5.1 QEMU images. However, be aware
+# it could have unknown side-effects on the labs.
+YOCTO_URL = http://downloads.yoctoproject.org/releases/yocto/yocto-5.1/machines/qemu/qemu$(ARCH)/
+YOCTO_IMAGE = core-image-minimal-qemu$(ARCH).rootfs.ext4
+#YOCTO_IMAGE = core-image-minimal-dev-qemu$(ARCH).rootfs.ext4
+#YOCTO_IMAGE = core-image-sato-dev-qemu$(ARCH).rootfs.ext4
+#YOCTO_IMAGE = core-image-sato-qemu$(ARCH).rootfs.ext4
+#YOCTO_IMAGE = core-image-sato-sdk-qemu$(ARCH).rootfs.ext4
 
 QEMU_OPTS = -kernel $(ZIMAGE) \
 	-device virtio-serial \
@@ -117,7 +121,7 @@ clean::
 #     alias kmake='make -C "$HOME/src/linux/" M="$(pwd)"'
 #     kmake
 
-YOCTO_ROOTFS = core-image-minimal-qemu$(ARCH).tar.bz2
+YOCTO_ROOTFS = core-image-minimal-qemu$(ARCH).rootfs.tar.bz2
 
 console: $(ZIMAGE) rootfs lkt-tap0 lkt-tap1 lkt-tap-smbd disk0.img disk1.img disk2.img pipe1.in pipe1.out pipe2.in pipe2.out
 	MODE=console qemu/run-qemu.sh
@@ -130,7 +134,7 @@ gui: $(ZIMAGE) rootfs lkt-tap0 lkt-tap1 lkt-tap-smbd disk0.img disk1.img disk2.i
 
 rootfs: $(YOCTO_ROOTFS)
 	mkdir -p rootfs
-	tar -xf core-image-minimal-qemux86.tar.bz2 -C rootfs
+	tar -xf core-image-minimal-qemux86.rootfs.tar.bz2 -C rootfs
 	sed -i 's@/sbin/getty@& -n -l "/sbin/rootlogin"@' rootfs/bin/start_getty
 	printf '%s\n' '#!/bin/sh' '/bin/login -f root' > rootfs/sbin/rootlogin
 	chmod +x rootfs/sbin/rootlogin
