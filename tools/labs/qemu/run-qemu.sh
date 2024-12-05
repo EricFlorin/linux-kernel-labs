@@ -41,6 +41,9 @@ case "$arch" in
     *) echo "unknown architecture '$arch'" >&2; exit 1 ;;
 esac
 
+# NOTE(EricFlorin): You will have to build Samba from source if you're running
+# this QEMU VM on a Debian 12 system. Apparently the pre-compiled package for
+# Samba for Debian 12 does not include the `smbd` daemon binary.
 smbd=${SMBD:-"smbd"}
 
 qemu=${QEMU:-"qemu-system-$qemu_arch"}
