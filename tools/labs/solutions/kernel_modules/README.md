@@ -84,3 +84,6 @@ Generate the skeleton for the task named `3-error-mod`. Compile the sources and 
     * module_init
     * module_exit
 * To resolve the compilation errors, we just need to add the `<linux/module.h>` header to the source file.
+
+# 4. Sub-modules
+
