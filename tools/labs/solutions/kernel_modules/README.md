@@ -52,3 +52,35 @@ Watch the virtual machine console. Why were the messages displayed directly to t
 
 Configure the system such that the messages are not displayed directly on the serial console, and they can only be inspected using `dmesg`.
 * Set the `console_loglevel` to a value of `4` using the command: `echo 4 > /proc/sys/kernel/printk`.
+
+# 3. Error
+Generate the skeleton for the task named `3-error-mod`. Compile the sources and get the corresponding kernel module. Why have compilation errors occurred? **Hint:** How does this module differ from the previous module?
+* When attempting to build `3-error-mod`, we would get the following compilation errors:
+```
+/home/kernellabs/Desktop/linux-kernel-labs/tools/labs/skels/./kernel_modules/3-error-mod/err_mod.c:5:20: error: expected declaration specifiers or ‘...’ before string constant
+    5 | MODULE_DESCRIPTION("Error module");
+      |                    ^~~~~~~~~~~~~~
+/home/kernellabs/Desktop/linux-kernel-labs/tools/labs/skels/./kernel_modules/3-error-mod/err_mod.c:6:15: error: expected declaration specifiers or ‘...’ before string constant
+    6 | MODULE_AUTHOR("Kernel Hacker");
+      |               ^~~~~~~~~~~~~~~
+/home/kernellabs/Desktop/linux-kernel-labs/tools/labs/skels/./kernel_modules/3-error-mod/err_mod.c:7:16: error: expected declaration specifiers or ‘...’ before string constant
+    7 | MODULE_LICENSE("GPL");
+      |                ^~~~~
+/home/kernellabs/Desktop/linux-kernel-labs/tools/labs/skels/./kernel_modules/3-error-mod/err_mod.c:24:1: warning: data definition has no type or storage class
+   24 | module_init(err_init);
+      | ^~~~~~~~~~~
+/home/kernellabs/Desktop/linux-kernel-labs/tools/labs/skels/./kernel_modules/3-error-mod/err_mod.c:24:1: error: type defaults to ‘int’ in declaration of ‘module_init’ [-Werror=implicit-int]
+/home/kernellabs/Desktop/linux-kernel-labs/tools/labs/skels/./kernel_modules/3-error-mod/err_mod.c:24:1: warning: parameter names (without types) in function declaration
+/home/kernellabs/Desktop/linux-kernel-labs/tools/labs/skels/./kernel_modules/3-error-mod/err_mod.c:25:1: warning: data definition has no type or storage class
+   25 | module_exit(err_exit);
+      | ^~~~~~~~~~~
+/home/kernellabs/Desktop/linux-kernel-labs/tools/labs/skels/./kernel_modules/3-error-mod/err_mod.c:25:1: error: type defaults to ‘int’ in declaration of ‘module_exit’ [-Werror=implicit-int]
+/home/kernellabs/Desktop/linux-kernel-labs/tools/labs/skels/./kernel_modules/3-error-mod/err_mod.c:25:1: warning: parameter names (without types) in function declaration
+```
+* This is because we're missing the `<linux/module.h>` header, which defines the macros:
+    * MODULE_DESCRIPTION
+    * MODULE_AUTHOR
+    * MODULE_LICENSE
+    * module_init
+    * module_exit
+* To resolve the compilation errors, we just need to add the `<linux/module.h>` header to the source file.
