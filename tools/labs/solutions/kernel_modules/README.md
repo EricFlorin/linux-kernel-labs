@@ -10,3 +10,37 @@ Using cscope or LXR find the definitions of the following symbols in the Linux k
 * `ignore_loglevel`
     * What is this variable used for?
         * The `ignore_loglevel` variable is a boolean that, when set to `true`, prints all kernel messages to the console regardless of log level.
+
+# 1. Kernel Module
+Start the VM using `make console`, and perform the following tasks:
+* Load the kernel module.
+    * Loaded the kernel module using the command: `insmod hello_mod.ko`
+* List the kernel modules and check if current module is present.
+    * Listed kernel modules using the command: `cat /proc/modules`
+    * Result of command:
+    ```
+    root@qemux86:~/skels/kernel_modules/1-2-test-mod# cat /proc/modules             
+    hello_mod 16384 0 - Live 0xe086f000 (O)
+    ```
+* Unload the kernel module.
+    * Unloaded the kernel module using the command: `rmmod hello_mod.ko`
+* View the messages displayed at loading/unloading the kernel module using `dmesg` command.
+    * Result:
+    ```
+    CIFS: Attempting to mount //10.0.2.1/skels                                      
+    CIFS: No dialect specified on mount. Default has changed to a more secure diale.
+    udevd[116]: starting version 3.2.14                                             
+    random: udevd: uninitialized urandom read (16 bytes read)                       
+    random: udevd: uninitialized urandom read (16 bytes read)                       
+    random: udevd: uninitialized urandom read (16 bytes read)                       
+    udevd[117]: starting eudev-3.2.14                                               
+    udevd[117]: inotify_init failed: Function not implemented                       
+    udevd[117]: error initializing inotify                                          
+    urandom_read: 1 callbacks suppressed                                            
+    random: dd: uninitialized urandom read (512 bytes read)                         
+    traps: hostname[192] trap invalid opcode ip:4ab277 sp:bfba31c0 error:0 in busyb]
+    random: crng init done                                                          
+    hello_mod: loading out-of-tree module taints kernel.                            
+    Hello!                                                                          
+    Goodbye!
+    ```
