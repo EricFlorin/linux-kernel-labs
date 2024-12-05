@@ -44,3 +44,11 @@ Start the VM using `make console`, and perform the following tasks:
     Hello!                                                                          
     Goodbye!
     ```
+
+# 2. Printk
+Watch the virtual machine console. Why were the messages displayed directly to the virtual machine console?
+* There were messages displayed directly to the virtual machine console because the `console_loglevel` variable is set to a value of `15`, allowing every kernel message to be printed to the console.
+    * See https://docs.kernel.org/core-api/printk-basics.html on how to check the value of `console_loglevel`.
+
+Configure the system such that the messages are not displayed directly on the serial console, and they can only be inspected using `dmesg`.
+* Set the `console_loglevel` to a value of `4` using the command: `echo 4 > /proc/sys/kernel/printk`.
