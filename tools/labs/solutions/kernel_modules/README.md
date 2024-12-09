@@ -107,3 +107,6 @@ Determine which instruction has triggered the oops.
 # 6. Module Parameters
 Without modifying the sources, load the kernel module so that the message shown is `Early bird gets tired`.
 - Loaded the kernel module with the following parameters: `insmod cmd_mod.ko str="tired"`
+
+# 7. Proc Info
+
