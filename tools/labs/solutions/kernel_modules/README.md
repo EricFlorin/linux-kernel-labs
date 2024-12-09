@@ -86,4 +86,8 @@ Generate the skeleton for the task named `3-error-mod`. Compile the sources and 
 * To resolve the compilation errors, we just need to add the `<linux/module.h>` header to the source file.
 
 # 4. Sub-modules
-
+Modified the `KBuild` file by adding the following lines:
+```
+obj-m = multimod.o
+multimod-y = mod1.o mod2.o
+```
