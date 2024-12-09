@@ -103,3 +103,7 @@ Compile the corresponding module and load it into the kernel. Identify the memor
 
 Determine which instruction has triggered the oops.
 - The instruction that triggered the oops was `movb   $0x61,0x0`
+
+# 6. Module Parameters
+Without modifying the sources, load the kernel module so that the message shown is `Early bird gets tired`.
+- Loaded the kernel module with the following parameters: `insmod cmd_mod.ko str="tired"`
