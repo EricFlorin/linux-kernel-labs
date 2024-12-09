@@ -91,3 +91,5 @@ Modified the `KBuild` file by adding the following lines:
 obj-m = multimod.o
 multimod-y = mod1.o mod2.o
 ```
+
+# 5. Kernel Oops
