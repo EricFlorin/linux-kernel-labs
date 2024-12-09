@@ -93,3 +93,13 @@ multimod-y = mod1.o mod2.o
 ```
 
 # 5. Kernel Oops
+Enter the directory for the task 5-oops-mod and inspect the C source file. Notice where the problem will occur. Add the compilation flag -g in the Kbuild file.
+- Kernel oops will occur on Line 15 of `oops_mod.c` due to dereferencing a null pointer.
+- Added the following line to enable debugging: `EXTRA_CFLAGS = -g`
+
+Compile the corresponding module and load it into the kernel. Identify the memory address at which the oops appeared.
+- **TIP:** Memory address at which the oops appeared is stored in the EIP register.
+- The memory address at which the oops appeared is `EIP: 0xb7f90549`
+
+Determine which instruction has triggered the oops.
+- The instruction that triggered the oops was `movb   $0x61,0x0`
