@@ -109,4 +109,56 @@ Without modifying the sources, load the kernel module so that the message shown 
 - Loaded the kernel module with the following parameters: `insmod cmd_mod.ko str="tired"`
 
 # 7. Proc Info
+Check the skeleton for the task named 7-list-proc. Add code to display the Process ID (PID) and the executable name for the current process.
+- **TIP:** To get the `task_struct` of the current process, use the `current` macro.
+- **TIP:** Processes are kept internally as a doubly linked list that starts with the `init` process. To access this list, use the `for_each_process(struct task_struct *)` macro.
 
+Output from loading/unloading the kernel module:
+```
+Current task name: insmod
+Current task PID: 257
+-----------------------
+Name: init | PID: 1
+Name: kthreadd | PID: 2
+Name: rcu_gp | PID: 3
+Name: rcu_par_gp | PID: 4
+Name: kworker/0:0H | PID: 6
+Name: mm_percpu_wq | PID: 8
+Name: ksoftirqd/0 | PID: 9
+Name: rcu_sched | PID: 10
+Name: migration/0 | PID: 11
+Name: cpuhp/0 | PID: 12
+Name: kdevtmpfs | PID: 13
+Name: netns | PID: 14
+Name: oom_reaper | PID: 15
+Name: writeback | PID: 16
+Name: kblockd | PID: 43
+Name: kworker/0:1 | PID: 44
+Name: kworker/0:1H | PID: 45
+Name: kswapd0 | PID: 46
+Name: cifsiod | PID: 47
+Name: smb3decryptd | PID: 48
+Name: cifsfileinfoput | PID: 49
+Name: cifsoplockd | PID: 50
+Name: acpi_thermal_pm | PID: 52
+Name: kworker/u2:1 | PID: 53
+Name: khvcd | PID: 54
+Name: kworker/0:2 | PID: 55
+Name: ipv6_addrconf | PID: 56
+Name: kmemleak | PID: 57
+Name: cifsd | PID: 59
+Name: kworker/u2:2 | PID: 65
+Name: cifsd | PID: 98
+Name: syslogd | PID: 213
+Name: klogd | PID: 216
+Name: ttyrun | PID: 221
+Name: ttyrun | PID: 222
+Name: getty | PID: 223
+Name: sh | PID: 224
+root@qemux86:~/skels/kernel_modules/7-list-proc# rmmod list_proc.ko 
+Name: insmod | PID: 257
+Exiting...
+Current task name: rmmod
+Current task PID: 258
+root@qemux86:~/skels/kernel_modules/7-list-proc#
+```
