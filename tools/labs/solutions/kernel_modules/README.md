@@ -345,3 +345,59 @@ Name: sh | PID: 224
   238 root      4272 R    ps
 ```
 - Both list the same processes with their respective PID.
+
+# Extra Exercises: 3. Memory Info
+Create a kernel module that displays the virtual memory areas (VMAs) of the current process; for each memory area it will display the start address and the end address.
+- First, we will use one of the other kernel modules as a template for our new `ps-vma-mod` kernel module.
+- Second, we will use the `current` macro to retrieve the `task_struct` of the current process.
+- Third, we will iterate through the VMAs stored by the `mm` field in the task struct. This will be done by iterating through the linked list in `mm->mmap`.
+
+Result:
+```
+Current task name: insmod
+Current task PID: 233
+-----------------------
+    VMA #    START_ADDR    END_ADDR
+    0    44b000    44d000
+    1    44d000    468000
+    2    468000    477000
+    3    477000    478000
+    4    478000    479000
+    5    1881000    18a3000
+    6    b781e000    b7820000
+    7    b7820000    b7821000
+    8    b7821000    b7822000
+    9    b7822000    b7823000
+    a    b7823000    b7824000
+    b    b7824000    b7825000
+    c    b7825000    b7844000
+    d    b7844000    b79c5000
+    e    b79c5000    b7a4c000
+    f    b7a4c000    b7a4e000                                                   
+    10    b7a4e000    b7a4f000                                                  
+    11    b7a4f000    b7a59000                                                  
+    12    b7a59000    b7abc000                                                  
+    13    b7abc000    b7d25000                                                  
+    14    b7d25000    b7e98000                                                  
+    15    b7e98000    b7ecd000                                                  
+    16    b7ecd000    b7ecf000                                                  
+    17    b7ecf000    b7ed1000                                                  
+    18    b7ed1000    b7ed3000                                                  
+    19    b7ed3000    b7ee2000                                                  
+    1a    b7ee2000    b7ee9000                                                  
+    1b    b7ee9000    b7eea000                                                  
+    1c    b7eea000    b7eeb000                                                  
+    1d    b7eeb000    b7eee000                                                  
+    1e    b7eee000    b7f10000                                                  
+    1f    b7f10000    b7f20000                                                  
+    20    b7f20000    b7f21000                                                  
+    21    b7f21000    b7f22000                                                  
+    22    b7f23000    b7f25000                                                  
+    23    b7f25000    b7f29000                                                  
+    24    b7f29000    b7f2b000                                                  
+    25    b7f2b000    b7f2c000                                                  
+    26    b7f2c000    b7f50000                                                  
+    27    b7f50000    b7f5e000                                                  
+    28    b7f5e000    b7f60000                                                  
+    29    b7f60000    b7f61000
+```
