@@ -162,3 +162,97 @@ Current task name: rmmod
 Current task PID: 258
 root@qemux86:~/skels/kernel_modules/7-list-proc#
 ```
+
+# Extra Exercises: 1. KDB
+Analyze the stacktrace and determine the code that generated the bug.
+- The code that generated the bug is in `dummy_func18` of the kernel module.
+
+```
+Kernel panic - not syncing: Hello KDB has paniced!
+CPU: 0 PID: 224 Comm: sh Tainted: G           O      5.10.14+ #2
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ dump_stack+0x6d/0x8b
+ panic+0xb2/0x262
+ ? dummy_func1+0x8/0x8 [hello_kdb]
+ dummy_func18+0xd/0xd [hello_kdb]
+ dummy_func17+0x8/0x8 [hello_kdb]
+ dummy_func16+0x8/0x8 [hello_kdb]
+ dummy_func15+0x8/0x8 [hello_kdb]
+ dummy_func14+0x8/0x8 [hello_kdb]
+ dummy_func13+0x8/0x8 [hello_kdb]
+ dummy_func12+0x8/0x8 [hello_kdb]
+ dummy_func11+0x8/0x8 [hello_kdb]
+ dummy_func10+0x8/0x8 [hello_kdb]
+ dummy_func9+0x8/0x8 [hello_kdb]
+ dummy_func8+0x8/0x8 [hello_kdb]
+ dummy_func7+0x8/0x8 [hello_kdb]
+ dummy_func6+0x8/0x8 [hello_kdb]
+ dummy_func5+0x8/0x8 [hello_kdb]
+ dummy_func4+0x8/0x8 [hello_kdb]
+ dummy_func3+0x8/0x8 [hello_kdb]
+ dummy_func2+0x8/0x8 [hello_kdb]
+ dummy_func1+0x8/0x8 [hello_kdb]
+ bug_write+0x8/0x8 [hello_kdb]
+ proc_reg_write+0x76/0xb0
+ ? proc_reg_read+0xb0/0xb0
+ vfs_write+0xe9/0x450
+ ? ksys_write+0x67/0xf0
+ ? lock_acquire+0x281/0x400
+ ? lock_acquired+0xe9/0x3a0
+ ? pick_file+0x1e/0xc0
+ ? lock_release+0x171/0x440
+ ? __might_sleep+0x32/0x90
+ ksys_write+0x67/0xf0
+ __ia32_sys_write+0x10/0x20
+ __do_fast_syscall_32+0x54/0x80
+ do_fast_syscall_32+0x32/0x70
+ do_SYSENTER_32+0x15/0x20
+ entry_SYSENTER_32+0x9f/0xf2
+EIP: 0xb7f9b549
+Code: 03 74 c0 01 10 05 03 74 b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d 76 00 58 b8 77 00 00 00 cd 80 90 8d 76
+EAX: ffffffda EBX: 00000001 ECX: 006341d0 EDX: 00000002
+ESI: b7eb2e2c EDI: 006341d0 EBP: 00000001 ESP: bf819b20
+DS: 007b ES: 007b FS: 0000 GS: 0033 SS: 007b EFLAGS: 00000246
+PANIC: Hello KDB has paniced!
+```
+
+How can we find out from KDB the address where the module was loaded?
+- To find the address where the module was loaded using KDB, we can use the `lsmod` command.
+- In this case, the `8-kdb` kernel module is loaded in `0xe0884000` or `0xe0886000`.
+
+In parallel, use GDB in a new window to view the code based on KDB information.
+```
+(gdb) x/30i 0xb7f9b549-30
+   0xb7f9b52b:	add    0x1(%esp,%esi,4),%esi
+   0xb7f9b52f:	adc    %al,(%edi)
+   0xb7f9b531:	add    0x1(%eax,%esi,4),%esi
+   0xb7f9b535:	adc    %cl,(%eax)
+   0xb7f9b537:	add    0x1(%eax,%ebx,8),%esi
+   0xb7f9b53b:	add    %al,(%eax)
+   0xb7f9b53d:	add    %al,(%eax)
+   0xb7f9b53f:	add    %dl,0x52(%ecx)
+   0xb7f9b542:	push   %ebp
+   0xb7f9b543:	mov    %esp,%ebp
+   0xb7f9b545:	sysenter
+   0xb7f9b547:	int    $0x80
+   0xb7f9b549:	pop    %ebp         # Error seems to occur when popping the item at %EBP, which had a value of 1.
+   0xb7f9b54a:	pop    %edx
+   0xb7f9b54b:	pop    %ecx
+   0xb7f9b54c:	ret
+   0xb7f9b54d:	nop
+   0xb7f9b54e:	nop
+   0xb7f9b54f:	nop
+   0xb7f9b550:	nop
+   0xb7f9b551:	lea    0x0(%esi),%esi
+   0xb7f9b554:	pop    %eax
+   0xb7f9b555:	mov    $0x77,%eax
+   0xb7f9b55a:	int    $0x80
+   0xb7f9b55c:	nop
+   0xb7f9b55d:	lea    0x0(%esi),%esi
+   0xb7f9b560:	mov    $0xad,%eax
+   0xb7f9b565:	int    $0x80
+   0xb7f9b567:	nop
+   0xb7f9b568:	nop
+(gdb)
+```
