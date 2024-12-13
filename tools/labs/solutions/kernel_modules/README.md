@@ -256,3 +256,92 @@ In parallel, use GDB in a new window to view the code based on KDB information.
    0xb7f9b568:	nop
 (gdb)
 ```
+
+# Extra Exercises: 2. PS Module
+Update the created kernel module at proc-info in order to display information about all the processes in the system, when inserting the kernel module, not just about the current process.
+- Completed in section "7. Proc Info"
+
+Afterwards, compare the obtained result with the output of the ps command.
+- Result from **kernel module:**
+```
+Name: init | PID: 1
+Name: kthreadd | PID: 2
+Name: rcu_gp | PID: 3
+Name: rcu_par_gp | PID: 4
+Name: kworker/0:0H | PID: 6
+Name: mm_percpu_wq | PID: 8
+Name: ksoftirqd/0 | PID: 9
+Name: rcu_sched | PID: 10
+Name: migration/0 | PID: 11
+Name: cpuhp/0 | PID: 12
+Name: kdevtmpfs | PID: 13
+Name: netns | PID: 14
+Name: oom_reaper | PID: 15
+Name: writeback | PID: 16
+Name: kblockd | PID: 43
+Name: kworker/0:1 | PID: 44
+Name: kworker/0:1H | PID: 45
+Name: kswapd0 | PID: 46
+Name: cifsiod | PID: 47
+Name: smb3decryptd | PID: 48
+Name: cifsfileinfoput | PID: 49
+Name: cifsoplockd | PID: 50
+Name: acpi_thermal_pm | PID: 52
+Name: kworker/u2:1 | PID: 53
+Name: khvcd | PID: 54
+Name: kworker/0:2 | PID: 55
+Name: ipv6_addrconf | PID: 56
+Name: kmemleak | PID: 57
+Name: cifsd | PID: 59
+Name: kworker/u2:2 | PID: 97
+Name: cifsd | PID: 98
+Name: syslogd | PID: 213
+Name: klogd | PID: 216
+Name: ttyrun | PID: 221
+Name: ttyrun | PID: 222
+Name: getty | PID: 223
+Name: sh | PID: 224
+```
+- Result from **ps command:**
+```
+  PID USER       VSZ STAT COMMAND
+    1 root      2828 S    init [5]
+    2 root         0 SW   [kthreadd]
+    3 root         0 IW<  [rcu_gp]
+    4 root         0 IW<  [rcu_par_gp]
+    6 root         0 IW<  [kworker/0:0H-ev]
+    8 root         0 IW<  [mm_percpu_wq]
+    9 root         0 SW   [ksoftirqd/0]
+   10 root         0 IW   [rcu_sched]
+   11 root         0 SW   [migration/0]
+   12 root         0 SW   [cpuhp/0]
+   13 root         0 SW   [kdevtmpfs]
+   14 root         0 IW<  [netns]
+   15 root         0 SW   [oom_reaper]
+   16 root         0 IW<  [writeback]
+   43 root         0 IW<  [kblockd]
+   44 root         0 IW   [kworker/0:1-cif]
+   45 root         0 IW<  [kworker/0:1H-kb]
+   46 root         0 SW   [kswapd0]
+   47 root         0 IW<  [cifsiod]
+   48 root         0 IW<  [smb3decryptd]
+   49 root         0 IW<  [cifsfileinfoput]
+   50 root         0 IW<  [cifsoplockd]
+   52 root         0 IW<  [acpi_thermal_pm]
+   53 root         0 IW   [kworker/u2:1-ev]
+   54 root         0 SW   [khvcd]
+   55 root         0 IW   [kworker/0:2-cif]
+   56 root         0 IW<  [ipv6_addrconf]
+   57 root         0 SWN  [kmemleak]
+   59 root         0 SW   [cifsd]
+   97 root         0 IW   [kworker/u2:2-ev]
+   98 root         0 SW   [cifsd]
+  213 root      4224 S    /sbin/syslogd -n -O /var/log/messages
+  216 root      4228 S    /sbin/klogd -n
+  221 root      2656 S    /usr/sbin/ttyrun ttyS0 /bin/start_getty 115200 ttyS0
+  222 root      2656 S    /usr/sbin/ttyrun ttyS1 /bin/start_getty 115200 ttyS1
+  223 root      4228 S    /sbin/getty 38400 tty1
+  224 root      4268 S    -sh
+  238 root      4272 R    ps
+```
+- Both list the same processes with their respective PID.
