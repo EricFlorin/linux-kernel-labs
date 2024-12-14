@@ -25,3 +25,17 @@ Using [LXR](http://elixir.free-electrons.com/linux/latest/source) find the defin
     - Defined in `include/linux/stddef.h`
     - Macro definition: `offsetof(TYPE, MEMBER)`
     - Macro that returns the memory offset of `MEMBER` within `struct TYPE`.
+
+# 1. Memory allocation in the Linux kernel
+Generate the skeleton for the task named **1-mem** and browse the contents of the `mem.c` file. Observe the use of `kmalloc()` call for memory allocation.
+- `kmalloc` is allocating (4096 * sizeof(*mem)) bytes of memory for `mem`.
+- The allocated memory is then freed when the kernel module is unloaded (through `mem_exit`).
+
+Compile the source code and load the `mem.ko` module using **insmod**.
+- Done
+
+View the kernel messages using the **dmesg** command.
+- Result: Printed a lot of "z" characters.
+
+Unload the kernel module using the **rmmod mem** command.
+- Done
