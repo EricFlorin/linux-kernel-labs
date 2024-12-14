@@ -206,3 +206,6 @@ PID: 224, Timestamp: 4294961381
 PID: 0, Timestamp: 4294961381
 root@qemux86:~/skels/kernel_api/3-memory#
 ```
+
+# 4. Working with kernel lists
+...
