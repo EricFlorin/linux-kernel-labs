@@ -401,3 +401,9 @@ Current task PID: 233
     28    b7f5e000    b7f60000                                                  
     29    b7f60000    b7f61000
 ```
+
+# Extra Exercises: 4. Dynamic Debugging
+I was unable to do this exercise because `/<debugfs>/dynamic_debug` doesn't exist after executing the following command: `mount -t debugfs none /debug`
+
+# Extra Exercises: 5. Dynamic Debugging During Initialization
+I was unable to do this exercise because `/<debugfs>/dynamic_debug` doesn't exist after executing the following command: `mount -t debugfs none /debug`
