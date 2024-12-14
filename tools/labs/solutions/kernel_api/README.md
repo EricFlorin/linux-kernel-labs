@@ -175,4 +175,34 @@ softirqs last disabled at (21949): [<c10238a7>] call_on_stack+0x47/0x60
 ```
 
 # 3. Working with kernel memory.
-...
+Generate the skeleton for the task named **3-memory** directory and browse the contents of the `memory.c` file. Notice the comments marked with `TODO`. You must allocate 4 structures of type `struct task_info` and initialize them (in `memory_init()`), then print and free them (in `memory_exit()`).
+
+(TODO 1) Allocate memory for `struct task_info` structure and initialize its fields:
+- The `pid` field to the PID transmitted as a parameter.
+- The `timestamp` field to the value of the `jiffies` variable, which holds the number of ticks that have occurred since the system booted.
+- **NOTE:** To allocate memory for `struct task_info`, we will use `kmalloc` to allocate `sizeof(struct task_info)` bytes of memory. Check that `kmalloc` did not return a null pointer before initializing the struct's fields.
+- **NOTE:** The `jiffies` variable is declared in `include/linux/jiffies.h` as an `extern` variable.
+
+(TODO 2) Allocate `struct task_info` for the current process, the parent process, the next process, the next process of the next process, with the following information:
+- PID of the current process, which can be retrieved from `struct task_struct` structure, returned by `current` macro.
+    - **NOTE:** To get the PID of the current process, access the `pid_t pid` field in `struct task_struct`.
+- PID of the parent process of the current process.
+    - **NOTE:** To get the `struct task_struct` of the parent process, access the `struct task_struct *parent` field.
+- PID of the next process from the list of processes, relative to the current process.
+    - **NOTE:** To get the `struct task_struct` of the next process in the list, use the `next_task` macro.
+- PID of the next process of the next process, relative to the current process.
+    - **NOTE:** To get the "next process of the next process", just use the `next_task` macro two times.
+
+(TODO 3) Display the four structures.
+- Use `printk()` to display their two fields: `pid` and `timestamp`.
+
+(TODO 4) Release the memory occupied by the structures (use `kfree()`).
+```
+root@qemux86:~/skels/kernel_api/3-memory# insmod memory.ko
+root@qemux86:~/skels/kernel_api/3-memory# rmmod memory.ko
+PID: 2, Timestamp: 4294926017
+PID: 231, Timestamp: 4294961381
+PID: 224, Timestamp: 4294961381
+PID: 0, Timestamp: 4294961381
+root@qemux86:~/skels/kernel_api/3-memory#
+```
