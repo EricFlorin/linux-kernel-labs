@@ -173,3 +173,6 @@ softirqs last  enabled at (21938): [<c10238a7>] call_on_stack+0x47/0x60
 softirqs last disabled at (21949): [<c10238a7>] call_on_stack+0x47/0x60
 ---[ end trace 2f4995680d0d1daa ]---
 ```
+
+# 3. Working with kernel memory.
+...
