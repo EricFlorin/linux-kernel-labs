@@ -208,4 +208,31 @@ root@qemux86:~/skels/kernel_api/3-memory#
 ```
 
 # 4. Working with kernel lists
-...
+Generate the skeleton for the task named **4-list**. Browse the contents of the `list.c` file and notice the comments marked with `TODO`. The current process will add the four structures from the previous exercise into a list. The list will be built in the `task_info_add_for_current()` function which is called when module is loaded. The list will be printed and deleted in the `list_exit()` function and the `task_info_purge_list()` function.
+
+(TODO 1) Complete the `task_info_add_to_list()` function to allocate a `struct task_info` structure and add it to the list.
+- **TIP:** The variable `head` represents the linked list of `struct task_info` objects.
+- **TIP:** Use `task_info_alloc()` to allocate `struct task_info` structures.
+- **TIP:** Use `list_add()` to add the allocated `struct task_info` structure into the list.
+
+(TODO 2) Complete the `task_info_purge_list()` function to delete all the elements in the list.
+- **TIP:** When deleting all the elements in the list, we need to remove:
+    1. The `struct list_head` entry in the list.
+    2. The `struct task_info` object associated with the `struct list_head` entry.
+- **TIP:** To iterate through the list while removing elements, we need to use `list_for_each_safe()`.
+- **TIP:** Use `list_entry()` to retrieve the `struct task_info` object associated with a `struct list_head` pointer.
+- **TIP:** Use `list_del()` to delete a `struct list_head` pointer.
+
+Compile the kernel module. Load and unload the module by following the messages displayed by the kernel.
+```
+root@qemux86:~/skels/kernel_api/4-list# insmod list.ko
+list: loading out-of-tree module taints kernel.
+root@qemux86:~/skels/kernel_api/4-list# rmmod list.ko
+before exiting: [ 
+(1, 4294923540) 
+(0, 4294923540) 
+(224, 4294923540) 
+(228, 4294923540) 
+]
+root@qemux86:~/skels/kernel_api/4-list#
+```
