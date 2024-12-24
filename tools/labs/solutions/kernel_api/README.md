@@ -236,3 +236,13 @@ before exiting: [
 ]
 root@qemux86:~/skels/kernel_api/4-list#
 ```
+
+# 5. Working with kernel lists for process handling
+(TODO 1) Implement the `task_info_find_pid()` function.
+- ...
+
+(TODO 2) Change a field of an item in the list so it does not expire. It must not satisfy a part of the expiration condition from `task_info_remove_expired()`.
+- ...
+
+Compile, copy, load and unload the kernel module following the displayed messages. Kernel module loading will take some time, because `sleep()` is being called by `schedule_timeout()` function.
+- ...
