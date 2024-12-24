@@ -263,3 +263,12 @@ after removing expired: [
 ]
 root@qemux86:~/skels/kernel_api/5-list-full#
 ```
+
+# 6. Synchronizing list work
+Generate the skeleton for the task named `6-list-sync`.
+1. Browse the code and look for `TODO 1` string.
+    - 
+2. Use a spinlock or a read-write lock to synchronize access to the list.
+    - 
+3. Compile, load and unload the kernel module.
+    - 
