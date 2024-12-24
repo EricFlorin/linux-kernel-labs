@@ -239,10 +239,27 @@ root@qemux86:~/skels/kernel_api/4-list#
 
 # 5. Working with kernel lists for process handling
 (TODO 1) Implement the `task_info_find_pid()` function.
-- ...
+- **TIP:** Use `list_for_each()` to iterate through the linked list.
+- **TIP:** Use `list_entry()` to get the `struct task_info` object associated with the list entry.
+- Essentially, loop through each element in the linked list until you either find the `struct task_info` object with the given PID or not.
 
 (TODO 2) Change a field of an item in the list so it does not expire. It must not satisfy a part of the expiration condition from `task_info_remove_expired()`.
-- ...
+- **TIP:** A process is considered "expired" if it was added more than 3 seconds ago and its `count` is less than or equal to 5. A simple way of keeping one task as unexpired would be to set the `count` of one process in the list to be a value greater than or equal to 5.
+- **TIP:** The `count` member is of type `atomic_t`; thus, we are required to use `atomic_set()` in cases where we want to give it a value.
 
 Compile, copy, load and unload the kernel module following the displayed messages. Kernel module loading will take some time, because `sleep()` is being called by `schedule_timeout()` function.
-- ...
+```
+root@qemux86:~/skels/kernel_api/5-list-full# insmod list-full.ko 
+list_full: loading out-of-tree module taints kernel.
+after first add: [ 
+(1, 187770) 
+(0, 187770) 
+(224, 187770) 
+(229, 187770) 
+]
+root@qemux86:~/skels/kernel_api/5-list-full# rmmod list-full.ko 
+after removing expired: [ 
+(1, 187770) 
+]
+root@qemux86:~/skels/kernel_api/5-list-full#
+```
