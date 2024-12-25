@@ -293,17 +293,42 @@ after removing expired: [
 ```
 
 # 7. Test module calling in our list module
-Uncomment the commented code from 7-list-test.c. Look for TODO 1.
-- ...
+Uncomment the commented code from `7-list-test.c`. Look for TODO 1.
+- Functions that need to be exported from **6-list-sync** are:
+    1. `task_info_add_for_current()`
+    2. `task_info_print_list()`
+    3. `task_info_remove_expired()`
 
-To export the above functions from the module located at 6-list-sync/ directory, the following steps are required:
+To export the above functions from the module located at `6-list-sync/` directory, the following steps are required:
 1. Functions must not be static.
 2. Use the **EXPORT_SYMBOL** macro to export the kernel symbols. For example: **`EXPORT_SYMBOL(task_info_remove_expired);`**. The macro must be used for each function after the function is defined. Browse the code and look for the `TODO 2` string in the `list-sync.c`.
 3. Remove from the module from **6-list-sync** the code that avoids the expiration of a list item (it is in contradiction to our exercise).
 4. Compile and load the module from `6-list-sync/`. Once loaded, it exposes exported functions and can be used by the test module. You can check this by searching for the function names in `/proc/kallsyms` before and after loading the module.
 5. Compile the test module and then load it.
 6. Use **lsmod** to check that the two modules have been loaded. What do you notice?
+    - **lsmod** is reporting that the `list_test` module is using resources from the `list_sync` module.
 7. Unload the kernel test module.
+    ```
+    root@qemux86:~/skels/kernel_api/7-list-test# insmod list-test.ko
+    after new addition: [ 
+    (242, 1016985) 
+    (1, 1016985) 
+    (0, 1016985) 
+    (224, 1016985) 
+    (240, 1011003) 
+    ]
+    root@qemux86:~/skels/kernel_api/7-list-test# lsmod
+    Module                  Size  Used by
+    list_test              16384  0
+    list_sync              16384  1 list_test
+    root@qemux86:~/skels/kernel_api/7-list-test# rmmod list-test.ko
+    after removing expired: [ 
+    ]
+    root@qemux86:~/skels/kernel_api/7-list-test#
+    ```
 
 What should be the unload order of the two modules (the module from **6-list-sync** and the test module)? What happens if you use another order?
-- ...
+- The **unload order** should be:
+    1. **7-list-test**
+    2. **6-list-sync**
+- If we attempt to unload **6-list-sync** first, then we get an error stating that the `list_sync` module is used by the `list_test` module.
