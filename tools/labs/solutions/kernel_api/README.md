@@ -291,3 +291,19 @@ after removing expired: [
 (232, 555875) 
 ]
 ```
+
+# 7. Test module calling in our list module
+Uncomment the commented code from 7-list-test.c. Look for TODO 1.
+- ...
+
+To export the above functions from the module located at 6-list-sync/ directory, the following steps are required:
+1. Functions must not be static.
+2. Use the **EXPORT_SYMBOL** macro to export the kernel symbols. For example: **`EXPORT_SYMBOL(task_info_remove_expired);`**. The macro must be used for each function after the function is defined. Browse the code and look for the `TODO 2` string in the `list-sync.c`.
+3. Remove from the module from **6-list-sync** the code that avoids the expiration of a list item (it is in contradiction to our exercise).
+4. Compile and load the module from `6-list-sync/`. Once loaded, it exposes exported functions and can be used by the test module. You can check this by searching for the function names in `/proc/kallsyms` before and after loading the module.
+5. Compile the test module and then load it.
+6. Use **lsmod** to check that the two modules have been loaded. What do you notice?
+7. Unload the kernel test module.
+
+What should be the unload order of the two modules (the module from **6-list-sync** and the test module)? What happens if you use another order?
+- ...
