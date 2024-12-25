@@ -267,8 +267,27 @@ root@qemux86:~/skels/kernel_api/5-list-full#
 # 6. Synchronizing list work
 Generate the skeleton for the task named `6-list-sync`.
 1. Browse the code and look for `TODO 1` string.
-    - 
+    - `task_info_find_pid()` has read access.
+    - `list_add()` has write access.
+    - Marked code in `task_info_print_list()` has read access.
+    - Marked code in `task_info_remove_expired()` has write access.
+    - Marked code in `task_info_purge_list()` has write access.
 2. Use a spinlock or a read-write lock to synchronize access to the list.
-    - 
+    - **TIP:** When using spinlocks (i.e. `spinlock_t`), some important functions to remember are:
+        1. `spin_lock_init()`: Initializes the spinlock.
+        2. `spin_lock()`: Acquires the spin lock.
+        3. `spin_unlock()`: Releases the spin lock.
 3. Compile, load and unload the kernel module.
-    - 
+```
+root@qemux86:~/skels/kernel_api/6-list-sync# insmod list-sync.ko 
+after first add: [ 
+(1, 555875) 
+(0, 555875) 
+(224, 555875) 
+(232, 555875) 
+]
+root@qemux86:~/skels/kernel_api/6-list-sync# rmmod list-sync.ko
+after removing expired: [ 
+(232, 555875) 
+]
+```
