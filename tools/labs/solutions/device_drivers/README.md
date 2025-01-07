@@ -101,3 +101,7 @@ The driver will control a single device with the `MY_MAJOR` major and `MY_MINOR`
     259 blkext
     root@qemux86:~/skels/device_drivers/kernel#
     ```
+
+# 2. Register an already registered major
+Modify **`MY_MAJOR`** so that it points to an already used major number. See `errno-base.h` and figure out what does the error code mean. Return to the initial configuration of the module.
+- ...
