@@ -104,4 +104,11 @@ The driver will control a single device with the `MY_MAJOR` major and `MY_MINOR`
 
 # 2. Register an already registered major
 Modify **`MY_MAJOR`** so that it points to an already used major number. See `errno-base.h` and figure out what does the error code mean. Return to the initial configuration of the module.
-- ...
+- Result from `insmod`:
+```
+root@qemux86:~/skels/device_drivers/kernel# insmod so2_cdev.ko
+Error Code: -16
+insmod: ERROR: could not insert module so2_cdev.ko: Device or resource busy
+root@qemux86:~/skels/device_drivers/kernel#
+```
+- By setting `MY_MAJOR` to an already used major, it resulted in `-EBUSY`, or that a device or resource is busy.
