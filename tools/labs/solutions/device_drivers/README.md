@@ -161,3 +161,5 @@ Restrict access to the device with atomic variables, so that a single process ca
     [1]+  Done(1)                    cat /dev/so2_cdev
     root@qemux86:~/skels/device_drivers/kernel#
     ```
+
+# 5. Read operation
