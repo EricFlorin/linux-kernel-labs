@@ -131,3 +131,5 @@ Run `cat /dev/so2_cdev` to read data from our char device. Reading does not work
     so2_cdev device file was opened.
     root@qemux86:~/skels/device_drivers/kernel#
     ```
+
+# 4. Access restriction
