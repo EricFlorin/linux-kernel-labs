@@ -112,3 +112,22 @@ insmod: ERROR: could not insert module so2_cdev.ko: Device or resource busy
 root@qemux86:~/skels/device_drivers/kernel#
 ```
 - By setting `MY_MAJOR` to an already used major, it resulted in `-EBUSY`, or that a device or resource is busy.
+
+# 3. Open and close
+Run `cat /dev/so2_cdev` to read data from our char device. Reading does not work because the driver does not have the open function implemented. Follow comments marked with `TODO 2` and implement them.
+1. Initialize your device.
+    - **TIP:** The `cdev` struct represents a character device.
+    - To **initialize** the `cdev` struct, use `cdev_init()` after the character device is assigned its identifiers using `register_chrdev_region()`. Then, notify the kernel using `cdev_add()`; note, `cdev_add()` must be called only after the device is ready to receive calls.
+    - To **remove** the `cdev` struct from the kernel core, use `cdev_del`; note that this is done when removing devices from the machine.
+2. Implement the open and release functions in the driver.
+    - **TIP:** `so2_cdev_open()` and `so2_cdev_release()` defined in the kernel module should be passed into the function pointers `open` and `release`, respectively, of the defined `so2_fops` struct.
+3. Display a message in the open and release functions.
+    - Used `pr_info` to print the message to the debug log.
+4. Read again /dev/so2_cdev file. Follow the messages displayed by the kernel. We still get an error because read function is not yet implemented.
+    - Error encountered:
+    ``` bash
+    root@qemux86:~/skels/device_drivers/kernel# cat /dev/so2_cdev 
+    cat: read error: Invalid argument
+    so2_cdev device file was opened.
+    root@qemux86:~/skels/device_drivers/kernel#
+    ```
