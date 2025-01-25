@@ -133,3 +133,31 @@ Run `cat /dev/so2_cdev` to read data from our char device. Reading does not work
     ```
 
 # 4. Access restriction
+Restrict access to the device with atomic variables, so that a single process can open the device at a time. The rest will receive the "device busy" error (`-EBUSY`). **Restricting access will be done in the open function displayed by the driver.** Follow comments marked with `TODO 3` and implement them.
+1. Add an `atomic_t` variable to the device structure.
+2. Initialize the variable at module initialization.
+    - **TIP:** Use `atomic_set()` to set the value of the `atomic_t` variable in the device struct.
+3. Use the variable in the open function to restrict access to the device. We recommend using `atomic_cmpxchg()`.
+    - **TIP:** `int atomic_cmpxchg(atomic_t *v, int old, int new)` represents an "atomic compare-and-exchange" operation.
+        - If the value contained in `v` matches `old`, then it is replaced by the `new` value.
+        - The **return value** is the "actual old value"; that is, the value that was (or currently is) stored in `v`.
+    - Given that we initialize the `atomic_t` variable in the device structure to be 0, we should check that `atomic_t` is either `0` (meaning the device is not in use by someone) or `1` (meaning the device is in use by someone).
+    - **WARNING:** Don't forget to initialize the `data` variable (i.e., pointer to a `so2_device_data` struct) using `container_of` as follows: `data = container_of(inode->i_cdev, struct so2_device_data, cdev);`
+        - Remember that `container_of` can be used to retrieve the whole structure wrapping one of its members whose pointer you have.
+4. Reset the variable in the release function to retrieve access to the device.
+    - **TIP:** Use `atomic_set()` to set the value of the `atomic_t` variable in the device struct.
+5. To test your deployment, you'll need to simulate a long-term use of your device. To simulate a sleep, call the scheduler at the end of the device opening using `schedule_timeout(10 * HZ)` (which puts the program to sleep for 10 seconds).
+    - Console Output
+    ``` bash
+    root@qemux86:~/skels/device_drivers/kernel# insmod so2_cdev.ko
+    Successfully registered char device region.
+    root@qemux86:~/skels/device_drivers/kernel# cat /dev/so2_cdev &     # Executes first read command in the background.
+    root@qemux86:~/skels/device_drivers/kernel# cat /dev/so2_cdev       # Second read fails with code -EBUSY.
+    so2_cdev device file was opened.
+    cat: can't open '/dev/so2_cdev': Device or resource busy
+    root@qemux86:~/skels/device_drivers/kernel# cat: read error: Invalid argument
+    so2_cdev device file was opened.
+
+    [1]+  Done(1)                    cat /dev/so2_cdev
+    root@qemux86:~/skels/device_drivers/kernel#
+    ```
