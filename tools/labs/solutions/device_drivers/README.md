@@ -229,3 +229,24 @@ root@qemux86:~/skels/device_drivers/kernel#
 ```
 
 # 7. ioctl operation
+For this exercise, we want to add the ioctl `MY_IOCTL_PRINT` to display the message from the `IOCTL_MESSAGE` macro in the driver. Follow the comments marked with `TODO 6`
+1. Implement the ioctl function in the driver.
+    - Added a case to the given switch statement in `so2_cdev_ioctl` that will print `IOCTL_MESSAGE` to the log file.
+    - **NOTE:** When adding the `so2_cdev_ioctl` function to `so2_fops`, you find that there are two versions of the `ioctl` function pointer:
+        - `compat_ioctl()` is used by 64-bit systems for 32-bit applications to make a `ioctl()` call; think of `compat_ioctl()` being used for backward compatibility with 32-bit applications.
+        - `unlocked_ioctl()` could be viewed as the "default" implementation of `ioctl()`; have the `unlocked_ioctl()` function pointer in `so2_fops` point to `so2_cdev_ioctl`.
+2. We need to use `user/so2_cdev_test.c` to call the ioctl function with the appropriate parameters.
+3. To test, we will use an user-space program (`user/so2_cdev_test.c`) which will call the `ioctl` function with the required arguments.
+    - **NOTE:** The user-space code is compiled automatically at `make build` and copied at `make copy`.
+    - **NOTE:** The qemu machine is 32-bits; thus if the host is 64-bits, you will need to install the `gcc-multilib` package.
+
+**Final Console Output:**
+```
+root@qemux86:~/skels/device_drivers/kernel# insmod so2_cdev.ko
+Successfully registered char device region.
+root@qemux86:~/skels/device_drivers/kernel# cd ../user/
+root@qemux86:~/skels/device_drivers/user# ./so2_cdev_test p
+so2_cdev device file was opened.
+Hello ioctl
+root@qemux86:~/skels/device_drivers/user#
+```
