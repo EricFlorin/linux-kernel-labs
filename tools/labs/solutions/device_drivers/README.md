@@ -227,3 +227,5 @@ arpeggio
 so2_cdev device file was opened.
 root@qemux86:~/skels/device_drivers/kernel#
 ```
+
+# 7. ioctl operation
