@@ -207,3 +207,23 @@ root@qemux86:~/skels/device_drivers/kernel#
 ```
 
 # 6. Write operation
+Add the ability to write a message into kernel buffer to replace the predefined message. Implement the write function in the driver. Follow comments marked with `TODO 5`
+
+Ignore the offset parameter at this time. You can assume that the driver buffer is large enough. You do not need to check the validity of the write function size argument.
+
+Process
+1. Add the `write` function to `so2_fops`.
+    - Basically, `.write = so2_cdev_write`
+2. Use `copy_from_user()` to copy memory from user-space into kernel-space.
+    - **IMPORTANT:** `copy_from_user()` returns 0 on success and non-negative representing the number of bytes that *failed* to copy.
+
+**Final Console Output:**
+```
+root@qemux86:~/skels/device_drivers/kernel# echo "arpeggio" > /dev/so2_cdev
+so2_cdev device file was opened.
+root@qemux86:~/skels/device_drivers/kernel# cat /dev/so2_cdev
+so2_cdev device file was released.
+arpeggio
+so2_cdev device file was opened.
+root@qemux86:~/skels/device_drivers/kernel#
+```
