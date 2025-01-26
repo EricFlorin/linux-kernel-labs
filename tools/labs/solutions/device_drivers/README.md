@@ -271,3 +271,5 @@ IOCTL buffer contains New message from user-space
 so2_cdev device file was opened.
 root@qemux86:~/skels/device_drivers/user#
 ```
+
+# Extra Exercises: Ioctl with waiting queues
