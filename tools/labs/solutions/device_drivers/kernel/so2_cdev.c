@@ -13,6 +13,7 @@
 #include <linux/uaccess.h>
 #include <linux/sched.h>
 #include <linux/wait.h>
+#include <linux/uaccess.h>
 
 #include "../include/so2_cdev.h"
 
@@ -38,6 +39,7 @@ struct so2_device_data {
 	/* TODO 2: add cdev member */
 	struct cdev cdev;
 	/* TODO 4: add buffer with BUFSIZ elements */
+	char buffer[BUFSIZ];
 	/* TODO 7: extra members for home */
 	/* TODO 3: add atomic_t access variable to keep track if file is opened */
 	atomic_t lock;
@@ -91,15 +93,31 @@ so2_cdev_read(struct file *file,
 {
 	struct so2_device_data *data =
 		(struct so2_device_data *) file->private_data;
-	size_t to_read;
+	size_t bytes_not_copied, to_read;
 
 #ifdef EXTRA
 	/* TODO 7: extra tasks for home */
 #endif
 
 	/* TODO 4: Copy data->buffer to user_buffer, use copy_to_user */
+	// Calculate the number of bytes we can actually read from the buffer.
+	// DO NOT READ BEYOND THE BUFFER!
+	to_read = min(size, BUFSIZ - *offset);
 
-	return to_read;
+	// If there is nothing to read, return EOF.
+	if (to_read == 0)
+		return 0;
+
+	// Copy data from kernel buffer to user buffer.
+	// NOTE: `copy_to_user` returns the number of bytes that WERE NOT copied.
+	// See: https://developer.ibm.com/articles/l-kernel-memory-access/
+	bytes_not_copied = copy_to_user(user_buffer, data->buffer + *offset, to_read);
+
+	// If copy was successful, update the offset.
+	*offset += to_read - bytes_not_copied;
+
+	// Return the number of bytes actually read.
+	return to_read - bytes_not_copied;
 }
 
 static ssize_t
@@ -141,6 +159,7 @@ static const struct file_operations so2_fops = {
 	.open = so2_cdev_open,
 	.release = so2_cdev_release,
 /* TODO 4: add read function */
+	.read = so2_cdev_read,
 /* TODO 5: add write function */
 /* TODO 6: add ioctl function */
 };
@@ -164,6 +183,8 @@ static int so2_cdev_init(void)
 		/* TODO 7: extra tasks, for home */
 #else
 		/*TODO 4: initialize buffer with MESSAGE string */
+		strncpy(devs[i].buffer, MESSAGE, BUFSIZ);
+
 		/* TODO 3: set access variable to 0, use atomic_set */
 		atomic_set(&devs[i].lock, 0);
 #endif

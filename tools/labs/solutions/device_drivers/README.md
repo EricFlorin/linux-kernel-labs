@@ -125,7 +125,7 @@ Run `cat /dev/so2_cdev` to read data from our char device. Reading does not work
     - Used `pr_info` to print the message to the debug log.
 4. Read again /dev/so2_cdev file. Follow the messages displayed by the kernel. We still get an error because read function is not yet implemented.
     - Error encountered:
-    ``` bash
+    ```
     root@qemux86:~/skels/device_drivers/kernel# cat /dev/so2_cdev 
     cat: read error: Invalid argument
     so2_cdev device file was opened.
@@ -148,7 +148,7 @@ Restrict access to the device with atomic variables, so that a single process ca
     - **TIP:** Use `atomic_set()` to set the value of the `atomic_t` variable in the device struct.
 5. To test your deployment, you'll need to simulate a long-term use of your device. To simulate a sleep, call the scheduler at the end of the device opening using `schedule_timeout(10 * HZ)` (which puts the program to sleep for 10 seconds).
     - Console Output
-    ``` bash
+    ```
     root@qemux86:~/skels/device_drivers/kernel# insmod so2_cdev.ko
     Successfully registered char device region.
     root@qemux86:~/skels/device_drivers/kernel# cat /dev/so2_cdev &     # Executes first read command in the background.
@@ -163,3 +163,45 @@ Restrict access to the device with atomic variables, so that a single process ca
     ```
 
 # 5. Read operation
+Implement the read function in the driver. Follow comments marked with `TODO 4` and implement them.
+1. Keep a buffer in `so2_device_data` structure initialized with the value of `MESSAGE` macro. Initializing this buffer will be done in module `init` function.
+    - We will define the buffer to be a `char[]`.
+    - In `so2_cdev_init()`, use `strncpy()` to copy `BUFSIZ` characters into the buffer held by `so2_device_data`.
+2. At a read call, copy the contents of the kernel space buffer into the user space buffer.
+    - First, we need to add `so2_cdev_read` to the `read` function pointer stored by `so2_fops`.
+    - Second, we need to copy the contents of `so2_device_data->buffer` from kernel-space into user-space using `copy_to_user()`.
+        - **REMINDER:** Initialize the `to_read` variable in `so2_cdev_read` to be the number of bytes transmitted from the kernel-space buffer to user-space buffer, given by `copy_to_user()`.
+3. After implementation, test using `cat /dev/so2_cdev`.
+    - Console Output:
+    ```
+    root@qemux86:~/skels/device_drivers/kernel# cat /dev/so2_cdev 
+    so2_cdev device file was released.
+    so2_cdev device file was opened.
+    root@qemux86:~/skels/device_drivers/kernel#
+    ```
+
+The `cat` command reads to the end of the file, and the end of the file is signaled by returning the value 0 in the read. Thus, for a correct implementation, you will need to update and use the offset received as a parameter in the read function and return the value 0 when the user has reached the end of the buffer.
+
+Modify the driver so that the cat commands ends:
+- **IMPORTANT:**  According to [this article](https://developer.ibm.com/articles/l-kernel-memory-access/), the `copy_to_user()` function returns the number of bytes that **weren't** copied to User-space; that is, `copy_to_user()` returns **0 if all bytes were transferred** and **non-negative representing the number of bytes that DID NOT transfer.**
+- **IMPORTANT:** `size` is the number of bytes the User wants to read, and `offset` is the location the read operation should start from the base buffer address.
+- The process for copying the buffer from kernel-space into user-space is as follows:
+    1. Initialize `to_read` to be the number of bytes we can actually read from the buffer without going over.
+        - Use the `min(size, BUFSIZ - *offset)` macro to set `to_read` to be either the number of bytes the User wants to read or the number of bytes that is left to read in the buffer, which ever one is less.
+        - **If there is nothing left to read,** then notify EOF to the caller by returning `0`.
+    2. Copy data from the kernel buffer to the user buffer.
+        - Use `copy_to_user(user_buffer, data->buffer + *offset, to_read)` to read the next set of bytes in the buffer, starting from the given offset.
+        - **IMPORTANT:** Store the *number of bytes not transferred* into `size_t bytes_not_copied` to later update the `offset` value.
+    3. Update the `offset` value.
+        - We want the new `offset` value to be the starting position of the next read.
+        - **TIP:** Recall that `to_read` is the number of bytes we attempted to read from the buffer, and `bytes_not_copied` is the number of bytes that failed to transfer from kernel-space to user-space. Thus, the next read starting position should be after the bytes we were able to transfer from kernel-space to user-space, or `*offset += to_read - bytes_not_copied`.
+    4. Return the number of bytes we were able to read.
+        - That is, `return to_read - bytes_not_copied`.
+
+**Final console output:**
+```
+root@qemux86:~/skels/device_drivers/kernel# cat /dev/so2_cdev
+hello
+so2_cdev device file was opened.
+root@qemux86:~/skels/device_drivers/kernel#
+```
