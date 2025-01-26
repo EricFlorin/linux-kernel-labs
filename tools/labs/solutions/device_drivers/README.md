@@ -252,3 +252,22 @@ root@qemux86:~/skels/device_drivers/user#
 ```
 
 # Extra Exercises: Ioctl with messaging
+Add two ioctl operations to modify the message associated with the driver. Use fixed-length buffer ( `BUFFER_SIZE` ).
+1. Add the `ioctl` function from the driver the following operations:
+    - `MY_IOCTL_SET_BUFFER` for writing a message to the device;
+    - `MY_IOCTL_GET_BUFFER` to read a message from your device.
+2. For testing, pass the required command line arguments to the user-space program.
+
+**TIP:** If the User is passing a buffer through `ioctl()`, then the `arg` parameter will be a pointer to it. Thus, `arg` will be casted to the appropriate pointer type and accessed with `copy_from_user()` and `copy_to_user()`.
+
+**Final Console Output:**
+```
+root@qemux86:~/skels/device_drivers/user# ./so2_cdev_test s "New message from us
+er-space"
+so2_cdev device file was opened.
+root@qemux86:~/skels/device_drivers/user# ./so2_cdev_test g
+so2_cdev device file was released.
+IOCTL buffer contains New message from user-space
+so2_cdev device file was opened.
+root@qemux86:~/skels/device_drivers/user#
+```

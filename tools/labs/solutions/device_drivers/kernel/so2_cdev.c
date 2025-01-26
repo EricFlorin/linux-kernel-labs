@@ -151,6 +151,14 @@ so2_cdev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		pr_info("%s\n", IOCTL_MESSAGE);
 		break;
 	/* TODO 7: extra tasks, for home */
+	case MY_IOCTL_SET_BUFFER:
+		// Writing a message to the device.
+		ret = copy_from_user(data->buffer, (void *) arg, BUFFER_SIZE);
+		break;
+	case MY_IOCTL_GET_BUFFER:
+		// Read a message from your device.
+		ret = copy_to_user((void *) arg, data->buffer, BUFFER_SIZE);
+		break;
 	default:
 		ret = -EINVAL;
 	}
