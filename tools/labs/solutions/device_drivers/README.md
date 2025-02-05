@@ -290,3 +290,21 @@ Add two ioctl operations to the device driver for queuing.
 - `init_waitqueue_head()`: Initializes the queue.
 - `wait_event()` adds the current thread to the queue.
 - `wake_up()` removes threads marked as `TASK_INTERRUPTIBLE` and `TASK_UNINTERRUPTIBLE` from the queue.
+
+**Final Console Output**
+Small note on the console output; the lab specification said to use two terminals connected to the QEMU machine to test the new modifications to the kernel module, with one terminal to be use to add a process to the wait queue and another terminal to wake up the threads in the wait queue.
+
+I was having issues getting this setup to work, so instead I added some debug statements into the kernel module that would print out the PID of the process being added to the waitqueue and the PID of the process waking up the threads in the waitqueue.
+
+```
+root@qemux86:~/skels/device_drivers/user# ./so2_cdev_test d &
+root@qemux86:~/skels/device_drivers/user# so2_cdev device file was opened.
+Adding process 232 to wait queue...
+
+root@qemux86:~/skels/device_drivers/user# ./so2_cdev_test u
+so2_cdev device file was opened.
+Process 233 is waking up threads in wait queue...
+so2_cdev device file was released.
+[1]+  Done                       ./so2_cdev_test d
+root@qemux86:~/skels/device_drivers/user#
+```

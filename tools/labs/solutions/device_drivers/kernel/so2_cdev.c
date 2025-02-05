@@ -44,7 +44,7 @@ struct so2_device_data {
 	char buffer[BUFSIZ];
 	/* TODO 7: extra members for home */
 	wait_queue_head_t wait_queue;
-	int wake_up_flag;
+	atomic_t wake_up_flag;
 	/* TODO 3: add atomic_t access variable to keep track if file is opened */
 	atomic_t lock;
 };
@@ -165,14 +165,14 @@ so2_cdev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		break;
 	case MY_IOCTL_DOWN:
 		// Add the process to the wait queue.
-		pr_info("Adding current thread to wait queue...\n");
-		data->wake_up_flag = 0;
-		ret = wait_event_interruptible(data->wait_queue, data->wake_up_flag != 0);
+		printk("Adding process %d to wait queue...\n", current->pid);
+		atomic_set(&data->wake_up_flag, 0);
+		ret = wait_event_interruptible(data->wait_queue, atomic_read(&data->wake_up_flag) != 0);
 		break;
 	case MY_IOCTL_UP:
 		// Remove the process from the wait queue.
-		pr_info("Waking up threads in wait queue...\n");
-		data->wake_up_flag = 1;
+		printk("Process %d is waking up threads in wait queue...\n", current->pid);
+		atomic_set(&data->wake_up_flag, 1);
 		wake_up(&data->wait_queue);
 		break;
 	default:
@@ -214,7 +214,7 @@ static int so2_cdev_init(void)
 		/* TODO 7: extra tasks, for home */
 		// Initialize wait queue.
 		init_waitqueue_head(&devs[i].wait_queue);
-		devs[i].wake_up_flag = 0;
+		atomic_set(&devs[i].wake_up_flag, 0);
 #else
 		/*TODO 4: initialize buffer with MESSAGE string */
 		strncpy(devs[i].buffer, MESSAGE, BUFSIZ);
