@@ -34,6 +34,8 @@ MODULE_LICENSE("GPL");
 #define BUFSIZ		4096
 #endif
 
+// NOTE(EricFlorin): Uncomment the EXTRA macro if you are testing code for "Extra Exercises"
+#define EXTRA
 
 struct so2_device_data {
 	/* TODO 2: add cdev member */
@@ -41,6 +43,8 @@ struct so2_device_data {
 	/* TODO 4: add buffer with BUFSIZ elements */
 	char buffer[BUFSIZ];
 	/* TODO 7: extra members for home */
+	wait_queue_head_t wait_queue;
+	int wake_up_flag;
 	/* TODO 3: add atomic_t access variable to keep track if file is opened */
 	atomic_t lock;
 };
@@ -159,6 +163,18 @@ so2_cdev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		// Read a message from your device.
 		ret = copy_to_user((void *) arg, data->buffer, BUFFER_SIZE);
 		break;
+	case MY_IOCTL_DOWN:
+		// Add the process to the wait queue.
+		pr_info("Adding current thread to wait queue...\n");
+		data->wake_up_flag = 0;
+		ret = wait_event_interruptible(data->wait_queue, data->wake_up_flag != 0);
+		break;
+	case MY_IOCTL_UP:
+		// Remove the process from the wait queue.
+		pr_info("Waking up threads in wait queue...\n");
+		data->wake_up_flag = 1;
+		wake_up(&data->wait_queue);
+		break;
 	default:
 		ret = -EINVAL;
 	}
@@ -196,6 +212,9 @@ static int so2_cdev_init(void)
 	for (i = 0; i < NUM_MINORS; i++) {
 #ifdef EXTRA
 		/* TODO 7: extra tasks, for home */
+		// Initialize wait queue.
+		init_waitqueue_head(&devs[i].wait_queue);
+		devs[i].wake_up_flag = 0;
 #else
 		/*TODO 4: initialize buffer with MESSAGE string */
 		strncpy(devs[i].buffer, MESSAGE, BUFSIZ);
@@ -204,6 +223,7 @@ static int so2_cdev_init(void)
 		atomic_set(&devs[i].lock, 0);
 #endif
 		/* TODO 7: extra tasks for home */
+
 		/* TODO 2: init and add cdev to kernel core */
 		cdev_init(&devs[i].cdev, &so2_fops);
 		cdev_add(&devs[i].cdev, MKDEV(MY_MAJOR, i), 1);

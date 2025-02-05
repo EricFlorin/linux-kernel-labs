@@ -273,3 +273,20 @@ root@qemux86:~/skels/device_drivers/user#
 ```
 
 # Extra Exercises: Ioctl with waiting queues
+Add two ioctl operations to the device driver for queuing.
+1. Add the `ioctl` function from the driver the following operations:
+    - `MY_IOCTL_DOWN` to add the process to a queue;
+    - `MY_IOCTL_UP` to remove the process from a queue.
+2. Fill the device structure with a `wait_queue_head_t` field and a flag.
+3. Do not forget to initialize the wait queue and flag.
+4. Remove exclusive access condition from previous exercise
+5. For testing, pass the required command line arguments to the user-space program.
+
+**NOTE:** A *waiting queue* is a list of processes that are waiting for a specific event.
+- **Before the event occurs,** processes in the waiting queue are blocked from execution.
+- **After the event occurs,** processes in the waiting queue are woken up.
+
+**TIP:** Useful wait queue macros/functions we'll be using in this part of the lab include:
+- `init_waitqueue_head()`: Initializes the queue.
+- `wait_event()` adds the current thread to the queue.
+- `wake_up()` removes threads marked as `TASK_INTERRUPTIBLE` and `TASK_UNINTERRUPTIBLE` from the queue.
