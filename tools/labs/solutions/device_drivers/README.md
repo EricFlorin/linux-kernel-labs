@@ -308,3 +308,16 @@ so2_cdev device file was released.
 [1]+  Done                       ./so2_cdev_test d
 root@qemux86:~/skels/device_drivers/user#
 ```
+
+# Extra Exercises: O_NONBLOCK implementation
+For this exercise:
+- Remove the exclusive access condition from previous exercises.
+- You can use the queue defined for the previous exercise.
+- You can ignore the file offset.
+- Modify the initial size of data to 0, to allow testing.
+
+`O_NONBLOCK` is a flag that can be passed when performing a read operation, which specifies that its operations will be non-blocking.
+
+In the event that the data is not avaliable when performing a read, the following happens:
+- If the file has been open with `O_NONBLOCK`, the read call will return `-EWOULDBLOCK`.
+- Otherwise, the current task (process) will be placed in a waiting queue and will be unblocked as soon as data becomes available (in our case, at write).
