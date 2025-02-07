@@ -321,3 +321,35 @@ For this exercise:
 In the event that the data is not avaliable when performing a read, the following happens:
 - If the file has been open with `O_NONBLOCK`, the read call will return `-EWOULDBLOCK`.
 - Otherwise, the current task (process) will be placed in a waiting queue and will be unblocked as soon as data becomes available (in our case, at write).
+
+**TIP:** `f_flags` in `struct file` represent the file's flags, such as `O_RDONLY`, `O_NONBLOCK`, and `O_SYNC`.
+
+**TIP:** To check if a flag is set in C, perform a bitwise `&` between the variable holding the flag and the flag macro, and see if the result equals to the flag macro.
+``` C
+#define O_NONBLOCK 0x80
+unsigned int flag;
+
+if ((flag & O_NONBLOCK) == O_NONBLOCK)
+    // O_NONBLOCK flag is set...
+```
+
+**TIP:** DO NOT use `so2_cdev_test g` or `so2_cdev_test s` to test the blocking portion of this exercise! These two commands uses the `ioctl` to read/write to a buffer in the device data. Instead use `cat /dev/so2_cdev` for reading and `echo "test" > /dev/so2_cdev` for writing to test the blocking portion.
+
+**Final Console Output:**
+```
+root@qemux86:~/skels/device_drivers/user# ./so2_cdev_test n
+so2_cdev device file was opened.
+Read would block, returning -EWOULDBLOCK...
+read: Resource temporarily unavailable
+root@qemux86:~/skels/device_drivers/user# cat /dev/so2_cdev &
+so2_cdev device file was released.
+so2_cdev device file was opened.
+Waiting for data...
+root@qemux86:~/skels/device_drivers/user# echo "Some data written" > /dev/so2_cdev
+so2_cdev device file was opened.
+Writing data, waking up readers...
+Data received, resuming read...
+Some data written
+Waiting for data...
+root@qemux86:~/skels/device_drivers/user#
+```

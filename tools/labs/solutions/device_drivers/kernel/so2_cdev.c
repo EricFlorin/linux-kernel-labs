@@ -45,6 +45,7 @@ struct so2_device_data {
 	/* TODO 7: extra members for home */
 	wait_queue_head_t wait_queue;
 	atomic_t wake_up_flag;
+	atomic_t read_unblock;
 	/* TODO 3: add atomic_t access variable to keep track if file is opened */
 	atomic_t lock;
 };
@@ -101,6 +102,14 @@ so2_cdev_read(struct file *file,
 
 #ifdef EXTRA
 	/* TODO 7: extra tasks for home */
+	if ((file->f_flags & O_NONBLOCK) == O_NONBLOCK){
+		pr_info("Read would block, returning -EWOULDBLOCK...\n");
+		return -EWOULDBLOCK;
+	}
+	atomic_set(&data->read_unblock, 0);
+	pr_info("Waiting for data...\n");
+	wait_event_interruptible(data->wait_queue, atomic_read(&data->read_unblock) != 0);
+	pr_info("Data received, resuming read...\n");
 #endif
 
 	/* TODO 4: Copy data->buffer to user_buffer, use copy_to_user */
@@ -137,6 +146,9 @@ so2_cdev_write(struct file *file,
 	copy_from_user(data->buffer, user_buffer, size);
 
 	/* TODO 7: extra tasks for home */
+	pr_info("Writing data, waking up readers...\n");
+	atomic_set(&data->read_unblock, 1);
+	wake_up(&data->wait_queue);
 
 	return size;
 }
@@ -215,6 +227,8 @@ static int so2_cdev_init(void)
 		// Initialize wait queue.
 		init_waitqueue_head(&devs[i].wait_queue);
 		atomic_set(&devs[i].wake_up_flag, 0);
+		atomic_set(&devs[i].read_unblock, 0);
+		memset(devs[i].buffer, 0, BUFSIZ);
 #else
 		/*TODO 4: initialize buffer with MESSAGE string */
 		strncpy(devs[i].buffer, MESSAGE, BUFSIZ);
@@ -223,6 +237,7 @@ static int so2_cdev_init(void)
 		atomic_set(&devs[i].lock, 0);
 #endif
 		/* TODO 7: extra tasks for home */
+		
 
 		/* TODO 2: init and add cdev to kernel core */
 		cdev_init(&devs[i].cdev, &so2_fops);
