@@ -27,3 +27,5 @@ Analyze the following Linux code:
 - The AT or PS/2 keyboard interrupt function `atkbd_interrupt()`
     - Defined in `drivers/input/keyboard/atkbd.c`
     - Interrupt handler that processes data from the keyboard into events.
+
+# 1. Request the I/O Ports
