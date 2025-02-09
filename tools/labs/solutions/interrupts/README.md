@@ -81,3 +81,5 @@ Driver kbd unloaded
 root@qemux86:~# cat /proc/ioports | grep kbd
 root@qemux86:~#
 ```
+
+# 2. Interrupt handling routine
