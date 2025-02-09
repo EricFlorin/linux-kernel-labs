@@ -189,3 +189,15 @@ Update the interrupt handler to add a pressed ASCII character to the end of the 
     ![Image of a console.](img-2-store-characters-to-the-buffer.png)
 
 # 4. Reading the buffer
+For this step follow the sections marked with **TODO 4** in the `kbd_read()` function.
+
+Implement `get_char()` in a similar way to `put_char()`. Be careful when implementing the circular buffer.
+- **TIP:** To implement the circular buffer in `get_char()`, ...
+
+In the `kbd_read()` function copy the data from the buffer to the userspace buffer.
+- **TIP:** Use `get_char()` to read a character from the buffer and `put_char()` to store it in the user-space buffer.
+- **NOTE:** In the read function, use `spin_lock_irqsave()` and `spin_unlock_irqrestore()` for locking. Remember that `spin_lock_irqsave()` disables interrupts upon locking and `spin_unlock_irqrestore()` enables interrupts upon unlocking; we need to do this to prevent an interrupt from creating a deadlock.
+- **WARNING:** We cannot use `put_user()` or `copy_to_user()` while holding the lock, as userspace access is not permitted from atomic contexts.
+
+Build, copy and boot the virtual machine and load the module. Test it using the `cat /dev/kbd` command.
+![Image of a console.](img-4-reading-the-buffer.png)
