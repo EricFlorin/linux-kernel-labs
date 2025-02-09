@@ -201,3 +201,5 @@ In the `kbd_read()` function copy the data from the buffer to the userspace buff
 
 Build, copy and boot the virtual machine and load the module. Test it using the `cat /dev/kbd` command.
 ![Image of a console.](img-4-reading-the-buffer.png)
+
+# 5. Reset the buffer
