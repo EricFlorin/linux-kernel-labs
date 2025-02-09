@@ -187,3 +187,5 @@ Update the interrupt handler to add a pressed ASCII character to the end of the 
 - **NOTE:** Synchronize the access to the buffer and the helper indexes with a spinlock. Define the spinlock in the device struct `struct kbd` and initialize it in `kbd_init()`. Use the `spin_lock()` and `spin_unlock()` functions to protect the buffer in the interrupt handler.
 - **Result:**
     ![Image of a console.](img-2-store-characters-to-the-buffer.png)
+
+# 4. Reading the buffer
