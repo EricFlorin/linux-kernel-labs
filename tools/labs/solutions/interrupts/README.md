@@ -150,3 +150,40 @@ Print a message inside the routine to make sure it is called. Compile and reload
   ```
 
 # 3. Store ASCII keys to buffer
+## Reading the Data Register
+First, fill in the `i8042_read_data()` function to read the `I8042_DATA_REG` of the keyboard controller. The function just needs to return the value of the register.
+- **TIP:** The `i8042_read_data()` function returns a `u8` (or byte). To read a byte from the I/O port, use `inb(u16 port)`.
+
+Call the `i8042_read_data()` in the `kbd_interrupt_handler()` and print the value read. Print information about the keystrokes in the following format:
+``` C
+pr_info("IRQ:% d, scancode = 0x%x (%u,%c)\n", irq_no, scancode, scancode, scancode);
+```
+Where scancode is the value of the read register using the `i8042_read_data()` function.
+- **Result:**
+    ```
+    IRQ: 1, scancode = 0x22 (34,")
+    Key press detected!
+    IRQ: 1, scancode = 0x1c (28,)
+    Key press detected!
+    root@qemux86:~#
+    ```
+
+## Interpreting the scancode
+Note that the registry value is a *scancode*, not the ASCII value of the character pressed. Also note that *an interrupt is sent both* when the *key is pressed* and when the *key is released.* **We only need to select the code when the key is pressed and then and decode the ASCII character.**
+
+In the interrupt handler check the scancode to see if the key is pressed or released then determine the corresponding ASCII character.
+- **TIP:** To check if the key is pressed or released, use `is_key_press()`.
+- **TIP:** To determine the corresponding ASCII character from the scancode, use
+`get_ascii()`.
+- **Result:**
+    ![Image of a console.](img-2-interpretting-the-scancode.png)
+
+## Store characters to the buffer
+Update the interrupt handler to add a pressed ASCII character to the end of the device buffer. If the buffer is full, the character will be discarded.
+- **TIP:** The device buffer is the field `buf` in the device's `struct kbd`.
+- **TIP:** The device buffer's dimension is located in the `struct kbd` field, called `count`.
+- **TIP:** The `put_idx` and `get_idx` fields specify the next writing and reading index, respectively.
+- **TIP:** Use `put_char()` to add a character to the device buffer.
+- **NOTE:** Synchronize the access to the buffer and the helper indexes with a spinlock. Define the spinlock in the device struct `struct kbd` and initialize it in `kbd_init()`. Use the `spin_lock()` and `spin_unlock()` functions to protect the buffer in the interrupt handler.
+- **Result:**
+    ![Image of a console.](img-2-store-characters-to-the-buffer.png)
