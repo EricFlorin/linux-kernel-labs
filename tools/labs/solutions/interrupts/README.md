@@ -83,3 +83,69 @@ root@qemux86:~#
 ```
 
 # 2. Interrupt handling routine
+First, define an empty interrupt handling routine named `kbd_interrupt_handler()`.
+- **NOTE:** Because we already have a keyboard driver that uses this interrupt, we should report this interrupt as *not handled* (i.e., return **IRQ_NONE**) so that the original driver still has a chance to process it.
+- **TIP:** Interrupt handlers have the following function pointer signature:
+    ```
+    irqreturn_t (*irq_handler_t)(int, void *);
+    ```
+- **TIP:** To register an interrupt handler, use `request_irq`.
+- **TIP:** To unregister an interrupt handler, use `free_irq`.
+
+Then register the interrupt handler routine using `request_irq`.
+- **TIP:** The interrupt line number we want to register the new interrupt handler to is specified by the `I8042_KBD_IRQ` macro.
+- **NOTE:** The interrupt handler must be requested with `IRQF_SHARED` to share the interrupt line with the keyboard driver (i8042).
+- **TIP:** For shared interrupts, the `dev_id` parameter cannot be `NULL`. Typically, `dev_id` contains a pointer to the device's data struct; thus, pass `&devs[0]` into `dev_id`.
+- **TIP:** To see the interrupt in `/proc/interrupts`, do not use `NULL` for `dev_name`. You can use the `MODULE_NAME` macro instead.
+
+Compile, copy and load module in the kernel. Check that the interrupt line has been registered by looking at /proc/interrupts .
+- Result:
+    ```
+    root@qemux86:~# cat /proc/interrupts
+           CPU0       
+    0:        129   IO-APIC   2-edge      timer
+    1:          9   IO-APIC   1-edge      i8042, kbd
+    2:          0    XT-PIC      cascade
+    9:          0   IO-APIC   9-fasteoi   acpi
+    10:        198   IO-APIC  10-fasteoi   virtio2, virtio5
+    11:      12867   IO-APIC  11-fasteoi   virtio3, virtio4, virtio0, virtio1
+    12:        125   IO-APIC  12-edge      i8042
+    NMI:          0   Non-maskable interrupts
+    LOC:      30857   Local timer interrupts
+    SPU:          0   Spurious interrupts
+    PMI:          0   Performance monitoring interrupts
+    IWI:          0   IRQ work interrupts
+    RTR:          0   APIC ICR read retries
+    RES:          0   Rescheduling interrupts
+    CAL:          0   Function call interrupts
+    TLB:          0   TLB shootdowns
+    ERR:          0
+    MIS:          0
+    PIN:          0   Posted-interrupt notification event
+    NPI:          0   Nested posted-interrupt event
+    PIW:          0   Posted-interrupt wakeup event
+    root@qemux86:~#
+    ```
+
+Print a message inside the routine to make sure it is called. Compile and reload the module into the kernel.
+- Result
+  ```
+  Key press detected!
+  Key press detected!
+  Key press detected!
+  Key press detected!
+  Key press detected!
+  Key press detected!
+  Key press detected!
+  Key press detected!
+  Key press detected!
+  Key press detected!
+  Key press detected!
+  Key press detected!
+  Key press detected!
+  Key press detected!
+  Key press detected!
+  Key press detected!
+  root@qemux86:~#
+  ```
+  
