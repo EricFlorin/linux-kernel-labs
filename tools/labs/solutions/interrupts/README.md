@@ -148,4 +148,5 @@ Print a message inside the routine to make sure it is called. Compile and reload
   Key press detected!
   root@qemux86:~#
   ```
-  
+
+# 3. Store ASCII keys to buffer
