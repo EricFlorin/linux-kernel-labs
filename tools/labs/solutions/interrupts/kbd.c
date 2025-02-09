@@ -19,9 +19,11 @@ MODULE_LICENSE("GPL");
 #define KBD_MINOR		0
 #define KBD_NR_MINORS	1
 
-#define I8042_KBD_IRQ		1
-#define I8042_STATUS_REG	0x64
-#define I8042_DATA_REG		0x60
+#define I8042_KBD_IRQ			1
+#define I8042_STATUS_REG		0x65
+#define I8042_STATUS_REG_SIZE 	1
+#define I8042_DATA_REG			0x61
+#define I8042_DATA_REG_SIZE		1
 
 #define BUFFER_SIZE		1024
 #define SCANCODE_RELEASED_MASK	0x80
@@ -152,6 +154,19 @@ static int kbd_init(void)
 	}
 
 	/* TODO 1: request the keyboard I/O ports */
+	if (!request_region(I8042_DATA_REG, I8042_DATA_REG_SIZE, MODULE_NAME))
+	{
+		pr_err("request_region for DATA register failed\n");
+		goto out_unregister;
+	}
+	if (!request_region(I8042_STATUS_REG, I8042_STATUS_REG_SIZE, MODULE_NAME))
+	{
+		pr_err("request_region for STATUS register failed\n");
+		// Need to release I/O region of DATA register.
+		release_region(I8042_DATA_REG, I8042_DATA_REG_SIZE);
+		goto out_unregister;
+	}
+
 
 	/* TODO 3: initialize spinlock */
 
@@ -179,6 +194,8 @@ static void kbd_exit(void)
 	/* TODO 2: Free IRQ. */
 
 	/* TODO 1: release keyboard I/O ports */
+	release_region(I8042_DATA_REG, I8042_DATA_REG_SIZE);
+	release_region(I8042_STATUS_REG, I8042_STATUS_REG_SIZE);
 
 
 	unregister_chrdev_region(MKDEV(KBD_MAJOR, KBD_MINOR),
