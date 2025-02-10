@@ -203,3 +203,13 @@ Build, copy and boot the virtual machine and load the module. Test it using the 
 ![Image of a console.](img-4-reading-the-buffer.png)
 
 # 5. Reset the buffer
+Implement `reset_buffer()` and add the write operation to `kbd_fops`.
+- **TIP:** In the write function, use `spin_lock_irqsave()` and `spin_unlock_irqrestore()` for locking when resetting the buffer.
+- **TIP:** The write function signature must match the following:
+``` C
+ssize_t (*write) (struct file *, const char __user *, size_t, loff_t *);
+```
+
+**Final Console Result:**
+
+![Image of a console](img-5-reset-the-buffer.png)
